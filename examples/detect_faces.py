@@ -13,33 +13,28 @@
 # limitations under the License.
 
 """
-Performs continuous object detection with the camera.
+Performs continuous face detection with the camera.
 
-Simply run the script and it will draw boxes around detected objects along
-with the predicted labels:
+Simply run the script and it will draw boxes around detected faces:
 
-    python3 detect_objects.py
+    python3 detect_faces.py
 
 For more instructions, see g.co/aiy/maker
 """
 
 from aiymakerkit import vision
-from pycoral.utils.dataset import read_label_file
 import models
-import os
 import time
+import os
 
 # Preventing QT errors when running without a display
 os.environ['QT_QPA_PLATFORM'] = 'xcb'
 
-detector = vision.Detector(models.OBJECT_DETECTION_MODEL)
-labels = read_label_file(models.OBJECT_DETECTION_LABELS)
-
-print(f"Loaded model: {models.OBJECT_DETECTION_MODEL}")
-print(f"Loaded {len(labels)} labels")
-print("Starting detection loop...\n")
-
 import cv2
+
+detector = vision.Detector(models.FACE_DETECTION_MODEL)
+print(f"Loaded model: {models.FACE_DETECTION_MODEL}")
+print("Starting detection loop...\n")
 
 frame_count = 0
 total_processing_time = 0.0
@@ -47,11 +42,13 @@ total_processing_time = 0.0
 for frame in vision.get_frames(display=False):
     start_time = time.time()
     frame_count += 1
-    objects = detector.get_objects(frame, threshold=0.2)
-    
+
+    faces = detector.get_objects(frame, threshold=0.1)
+    vision.draw_objects(frame, faces)
+
     # Show the frame ourselves after drawing
-    vision.draw_objects(frame, objects, labels)
-    cv2.imshow('Object Detection', frame)
+    vision.draw_objects(frame, faces)
+    cv2.imshow('Face Detection', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     

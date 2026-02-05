@@ -20,12 +20,21 @@ set -e
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly TEST_DATA_URL="https://github.com/google-coral/test_data/raw/master/"
+readonly MODEL_DIR="${SCRIPT_DIR}/models"
+
+if [[ -d "${MODEL_DIR}" ]]; then
+  echo "Models directory exists. Skipping downloads."
+  exit 1
+fi
+
+mkdir -p "${MODEL_DIR}"
 
 echo "Downloading model files..."
 (
-  cd "${SCRIPT_DIR}" &&
+  cd "${MODEL_DIR}" &&
     curl \
       -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite" \
-      -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite"
+      -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_face_quant_postprocess_edgetpu.tflite" \
+      -OL "${TEST_DATA_URL}/coco_labels.txt" 
 )
 echo "Done."

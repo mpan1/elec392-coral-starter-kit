@@ -49,7 +49,7 @@ from ipc.udp import UdpDetectionSender
 def path(name):
     """Creates an absolute path to a file in the same directory as this script."""
     root = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(root, name)
+    return os.path.join(root, 'models', name)
 
 
 def format_detections(objects, frame_width, frame_height):

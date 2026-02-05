@@ -57,7 +57,15 @@ import os.path
 import argparse
 import time
 from aiymakerkit import vision
+from pycoral.utils.dataset import read_label_file
 from aiymakerkit import utils
+import models
+import cv2
+
+import os
+
+# Preventing QT errors when running without a display
+os.environ['QT_QPA_PLATFORM'] = 'xcb'
 
 
 def path(name):
@@ -73,8 +81,8 @@ def main():
     parser.add_argument(
         "--confidence",
         type=float,
-        default=0.5,
-        help="Minimum confidence score for detections (default: 0.5)"
+        default=0.2,
+        help="Minimum confidence score for detections (default: 0.2)"
     )
     parser.add_argument(
         "--model",
@@ -115,15 +123,15 @@ def main():
                 print(f"Error: Labels file not found: {args.labels}")
                 return
             print(f"Using custom labels: {args.labels}")
-            labels = utils.read_label_file(args.labels)
+            labels = read_label_file(args.labels)
         else:
             print("Warning: No labels file provided for custom model. Using generic labels.")
             labels = {}
     else:
         # Use default model from AIY Maker Kit
-        model_path = path('ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite')
+        model_path = models.OBJECT_DETECTION_MODEL
+        labels = read_label_file(models.OBJECT_DETECTION_LABELS)
         print("Using default SSD MobileNet v2 COCO model")
-        labels = utils.read_labels_from_metadata(model_path)
     
     # Load the TensorFlow Lite model (compiled for the Edge TPU)
     detector = vision.Detector(model_path)
@@ -146,7 +154,7 @@ def main():
     
     try:
         # Get frames with or without display
-        for frame in vision.get_frames(display=display_mode):
+        for frame in vision.get_frames(display=False):
             try:
                 start_time = time.time()
                 
@@ -157,6 +165,12 @@ def main():
                 # Draw detections only if display is on and --no-draw is not set
                 if display_mode and not args.no_draw:
                     vision.draw_objects(frame, objects, labels=labels, color=(0, 255, 0), thickness=2)
+
+                # Show the frame if display is enabled
+                if display_mode:
+                    cv2.imshow('Object Detection', frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
                 
                 # Print summary every 1 second
                 current_time = time.time()
