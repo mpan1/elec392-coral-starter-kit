@@ -36,5 +36,5 @@ echo "Downloading model files..."
       -OL "${TEST_DATA_URL}/imagenet_labels.txt" \
       -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite" \
       -OL "${TEST_DATA_URL}/coco_labels.txt" \
-      -OL "${TEST_DATA_URL}/mobilenet_v1_1.0_224_l2norm_quant_edgetpu.tflite" \)
+      -OL "${TEST_DATA_URL}/mobilenet_v1_1.0_224_l2norm_quant_edgetpu.tflite" )
 echo "Done."
